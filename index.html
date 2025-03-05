@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Storm</title>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend+Zetta&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend+Zetta&family=Poppins&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
@@ -21,6 +21,7 @@
             width: 100%;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             padding: 10px 20px;
             background: rgba(17, 17, 17, 0.6);
             backdrop-filter: blur(10px);
@@ -32,6 +33,19 @@
         .header img {
             height: 35px;
             padding: 20px;
+        }
+        .dashboard-btn {
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            color: lightgray;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-right: 55px;
+            padding-left: 40px;
+        }
+        .dashboard-btn:hover {
+            color: #fff;
         }
         .container {
             display: flex;
@@ -51,18 +65,6 @@
             font-weight: bold;
             font-family: 'Lexend Zetta', sans-serif;
             position: relative;
-        }
-        .red-glow {
-            position: absolute;
-            left: 48%;
-            top: 50%;
-            transform: translate(-50%, -50%) rotate(-15deg);
-            width: 300px;
-            height: 250px;
-            background: radial-gradient(circle, rgba(255, 0, 0, 0.5) 20%, rgba(255, 0, 0, 0.1) 60%, rgba(255, 0, 0, 0) 100%);
-            border-radius: 50% 40% 60% 30%;
-            filter: blur(50px);
-            z-index: -1;
         }
         .subtitle {
             font-size: 1.5rem;
@@ -102,28 +104,6 @@
             background: #999;
             color: black;
         }
-        .doc-btn {
-            margin-bottom: 20px;
-            padding: 10px 20px;
-            border-radius: 30px;
-            border: 2px solid #777;
-            background: transparent;
-            color: gray;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.8rem;
-            opacity: 0;
-            transform: translateY(-20px);
-            animation: fadeSlideIn 1s forwards 0.8s;
-        }
-        .doc-btn span {
-            color: white;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        .doc-btn:hover {
-            border: 2px solid #fff;
-        }
         @keyframes fadeSlideIn {
             from {
                 opacity: 0;
@@ -139,17 +119,12 @@
 <body>
     <div class="header">
         <a href="index.html">
-        <img src="https://i.imgur.com/fiBGS25.png" alt="Storm Logo">
+            <img src="https://i.imgur.com/fiBGS25.png" alt="Storm Logo">
         </a>
+        <a href="dashboard.html" class="dashboard-btn">Dashboard</a>
     </div>
     <div class="container">
-        <button class="doc-btn" onclick="window.location.href='https://gitbook.com'">
-            Our documentation <span>Gitbook ></span>
-        </button>
-        <div class="title">
-            <div class="red-glow"></div>
-            STORM
-        </div>
+        <div class="title">STORM</div>
         <div class="subtitle">Your journey to the unknown begins here.</div>
         <div class="btn-container">
             <button class="btn" onclick="window.location.href='purchase.html'">Purchase</button>
