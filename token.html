@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Login | Storm</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend+Zetta&family=Poppins&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #111;
+            color: white;
+            text-align: center;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background: rgba(17, 17, 17, 0.6);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: fadeSlideIn 1s forwards;
+        }
+
+        .header img {
+            height: 35px;
+            padding: 20px;
+        }
+
+        .dashboard-btn {
+            font-size: 1rem;
+            color: lightgray;
+            text-decoration: none;
+            transition: 0.3s;
+            margin-right: 55px;
+        }
+
+        .dashboard-btn:hover {
+            color: white;
+        }
+
+        .container {
+            margin-top: 100px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 10px auto;
+            width: 300px;
+            box-shadow: 0px 0px 15px rgba(255, 0, 0, 0.6);
+            transition: 0.3s;
+        }
+
+        .panel:hover {
+            box-shadow: 0px 0px 25px rgba(255, 0, 0, 0.8);
+        }
+
+        .input-field {
+            width: 250px;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 6px;
+            border: none;
+            background: #222;
+            color: white;
+            text-align: center;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 6px;
+            border: none;
+            background: red;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: darkred;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html">
+            <img src="https://i.imgur.com/fiBGS25.png" alt="Storm Logo">
+        </a>
+        <a href="token_login.html" class="dashboard-btn">Token Login</a>
+    </div>
+
+    <div class="container">
+        <h1>Login with Your Token</h1>
+        
+        <div id="auth-section">
+            <input type="text" id="tokenInput" class="input-field" placeholder="Enter your Storm_User token">
+            <button class="btn" onclick="tokenLogin()">Login</button>
+        </div>
+
+        <div id="user-info" style="display: none;">
+            <div class="panel">User ID: <span id="userID">-</span></div>
+            <div class="panel">Your Token: <span id="userToken">-</span></div>
+            <button class="btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Config (Replace with your own)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBClf7XcskCj2eQpeMcgEo7nDtJlK6TxmU",
+            authDomain: "storm-v5.firebaseapp.com",
+            databaseURL: "https://storm-v5-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "storm-v5",
+            storageBucket: "storm-v5.firebasestorage.app",
+            messagingSenderId: "635578156232",
+            appId: "1:635578156232:web:8f47ae67074ac6fab551fd"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        function tokenLogin() {
+            const token = document.getElementById('tokenInput').value;
+
+            database.ref('users').once('value', snapshot => {
+                let foundUser = null;
+
+                snapshot.forEach(childSnapshot => {
+                    const userData = childSnapshot.val();
+                    if (userData.token === token) {
+                        foundUser = { uid: childSnapshot.key, token: userData.token };
+                    }
+                });
+
+                if (foundUser) {
+                    showUserInfo(foundUser.uid, foundUser.token);
+                } else {
+                    alert("Invalid token. Please try again.");
+                }
+            });
+        }
+
+        function showUserInfo(userId, token) {
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('user-info').style.display = 'block';
+            document.getElementById('userID').innerText = userId;
+            document.getElementById('userToken').innerText = token;
+        }
+
+        function logout() {
+            document.getElementById('auth-section').style.display = 'block';
+            document.getElementById('user-info').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
