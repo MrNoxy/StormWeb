@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Storm</title>
+    <title>Auth | Storm</title>
     <link href="https://fonts.googleapis.com/css2?family=Lexend+Zetta&family=Poppins&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -28,9 +28,6 @@
             background: rgba(17, 17, 17, 0.6);
             backdrop-filter: blur(10px);
             z-index: 1000;
-            opacity: 0;
-            transform: translateY(-20px);
-            animation: fadeSlideIn 1s forwards;
         }
 
         .header img {
@@ -51,58 +48,60 @@
         }
 
         .container {
-            margin-top: 100px;
+            margin-top: 200px;
         }
 
         .panel {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 20px;
-            margin: 10px auto;
-            width: 300px;
-            box-shadow: 0px 0px 15px rgba(255, 0, 0, 0.6);
+            background: #222;
+            border-radius: 15px;
+            padding: 50px;
+            width: 320px;
+            margin: auto;
+            box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.3);
             transition: 0.3s;
-        }
-
-        .panel:hover {
-            box-shadow: 0px 0px 25px rgba(255, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .input-field {
-            width: 250px;
+            width: 100%;
             padding: 10px;
-            margin: 5px;
+            margin: 10px 0;
             border-radius: 6px;
             border: none;
-            background: #222;
+            background: #333;
             color: white;
-            text-align: center;
+            text-align: left;
+            padding-left: 10px;
         }
 
-        .btn {
-            padding: 10px 15px;
-            margin: 5px;
-            border-radius: 6px;
-            border: none;
-            background: red;
-            color: white;
+        .links-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .link {
+            color: lightblue;
             cursor: pointer;
             transition: 0.3s;
         }
 
-        .btn:hover {
-            background: darkred;
+        .link:hover {
+            color: white;
         }
 
-        @keyframes fadeSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .btn-full {
+            width: 100%;
+            background: #333;
+            margin-top: 40px;
+            padding: 12px;
+        }
+
+        .btn-full:hover {
+            background: #444;
         }
     </style>
 </head>
@@ -115,24 +114,18 @@
     </div>
 
     <div class="container">
-        <h1>Welcome to Your Dashboard</h1>
-        
-        <div id="auth-section">
+        <div class="panel">
             <input type="email" id="email" class="input-field" placeholder="Email">
             <input type="password" id="password" class="input-field" placeholder="Password">
-            <button class="btn" onclick="register()">Register</button>
-            <button class="btn" onclick="login()">Login</button>
-        </div>
-
-        <div id="user-info" style="display: none;">
-            <div class="panel">User ID: <span id="userID">-</span></div>
-            <div class="panel">Your Token: <span id="userToken">-</span></div>
-            <button class="btn" onclick="logout()">Logout</button>
+            <div class="links-container">
+                <span class="link" onclick="resetPassword()">Reset Password</span>
+                <span class="link" id="toggle-mode" onclick="toggleMode()">Register</span>
+            </div>
+            <button class="btn-full" id="auth-button" onclick="authenticate()">Login</button>
         </div>
     </div>
 
     <script>
-        // Firebase Config (Replace with your own)
         const firebaseConfig = {
             apiKey: "AIzaSyBClf7XcskCj2eQpeMcgEo7nDtJlK6TxmU",
             authDomain: "storm-v5.firebaseapp.com",
@@ -147,59 +140,90 @@
         const auth = firebase.auth();
         const database = firebase.database();
 
+        let isRegistering = false;
+
+        // Check if user is already logged in
+        window.onload = function() {
+            const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+            if (userInfo) {
+                showUserInfo(userInfo.userId, userInfo.email, userInfo.password, userInfo.token);
+            }
+        };
+
+        function toggleMode() {
+            isRegistering = !isRegistering;
+            document.getElementById('toggle-mode').textContent = isRegistering ? 'Login' : 'Register';
+            document.getElementById('auth-button').textContent = isRegistering ? 'Register' : 'Login';
+            // Clear the input fields
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+        }
+
         function generateToken() {
             return "Storm_User_" + Array.from({ length: 20 }, () => Math.floor(Math.random() * 36).toString(36)).join('');
         }
 
-        function register() {
+        function authenticate() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            auth.createUserWithEmailAndPassword(email, password)
-                .then(userCredential => {
+            if (isRegistering) {
+                // Register user
+                auth.createUserWithEmailAndPassword(email, password).then(userCredential => {
                     const user = userCredential.user;
                     const token = generateToken();
-
                     database.ref('users/' + user.uid).set({
                         email: user.email,
+                        password: password,
                         token: token
                     });
-
-                    alert('Registered successfully! Your token: ' + token);
-                    showUserInfo(user.uid, token);
-                })
-                .catch(error => alert(error.message));
-        }
-
-        function login() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            auth.signInWithEmailAndPassword(email, password)
-                .then(userCredential => {
+                    const userInfo = {
+                        userId: user.uid,
+                        email: user.email,
+                        password: password,
+                        token: token
+                    };
+                    localStorage.setItem("userInfo", JSON.stringify(userInfo)); // Store user info in localStorage
+                    showUserInfo(user.uid, user.email, password, token);
+                }).catch(error => alert(error.message));
+            } else {
+                // Log in user
+                auth.signInWithEmailAndPassword(email, password).then(userCredential => {
                     const user = userCredential.user;
                     database.ref('users/' + user.uid).once('value', snapshot => {
                         if (snapshot.exists()) {
                             const userData = snapshot.val();
-                            showUserInfo(user.uid, userData.token);
+                            const userInfo = {
+                                userId: user.uid,
+                                email: userData.email,
+                                password: userData.password,
+                                token: userData.token
+                            };
+                            localStorage.setItem("userInfo", JSON.stringify(userInfo)); // Store user info in localStorage
+                            showUserInfo(user.uid, userData.email, userData.password, userData.token);
                         }
                     });
-                })
-                .catch(error => alert(error.message));
+                }).catch(error => alert(error.message));
+            }
         }
 
-        function showUserInfo(userId, token) {
-            document.getElementById('auth-section').style.display = 'none';
-            document.getElementById('user-info').style.display = 'block';
-            document.getElementById('userID').innerText = userId;
-            document.getElementById('userToken').innerText = token;
+        function showUserInfo(userId, email, password, token) {
+            document.body.innerHTML = `<div class='container'><div class='panel'><h2>User Info</h2>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Password:</strong> ${password}</p>
+                <p><strong>User ID:</strong> ${userId}</p>
+                <p><strong>Token:</strong> ${token}</p>
+                <button class='btn-full' onclick='logout()'>Logout</button></div></div>`;
         }
 
+        function resetPassword() {
+            alert('Reset password link sent!');
+        }
+
+        // Logout function to clear localStorage and reload
         function logout() {
-            auth.signOut().then(() => {
-                document.getElementById('auth-section').style.display = 'block';
-                document.getElementById('user-info').style.display = 'none';
-            });
+            localStorage.removeItem("userInfo");
+            location.reload();
         }
     </script>
 </body>
