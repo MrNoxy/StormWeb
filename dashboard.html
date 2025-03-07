@@ -3,129 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auth | Storm</title>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend+Zetta&family=Poppins&display=swap" rel="stylesheet">
+    <title>Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <style>
         body {
             margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-color: #1a1a1a;
+            background-image: url('https://i.imgur.com/cL2RoYu.jpg');
+            background-size: cover;
             font-family: 'Poppins', sans-serif;
-            background-color: #111;
             color: white;
-            text-align: center;
-        }
-
-        .header {
-            position: fixed;
-            top: 0;
-            width: 100%;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 10px 20px;
-            background: rgba(17, 17, 17, 0.6);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
+            justify-content: center;
         }
 
-        .header img {
-            height: 35px;
-            padding: 20px;
-        }
-
-        .dashboard-btn {
-            font-size: 1rem;
-            color: lightgray;
-            text-decoration: none;
-            transition: 0.3s;
-            margin-right: 55px;
-        }
-
-        .dashboard-btn:hover {
-            color: white;
-        }
-
-        .container {
-            margin-top: 200px;
-        }
-
-        .panel {
-            background: #222;
-            border-radius: 15px;
-            padding: 50px;
-            width: 320px;
-            margin: auto;
-            box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.3);
-            transition: 0.3s;
+        .login-container {
+            background-color: rgba(18, 18, 18, 0.4);
+            backdrop-filter: blur(8px);
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 300px;
+            height: 430px;
             display: flex;
             flex-direction: column;
-            align-items: center;
+        }
+
+        .fingerprint-icon {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .fingerprint-icon img {
+            width: 60px;
+            height: 60px;
+        }
+
+        .login-message {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 2.5;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            opacity: 0.7;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            margin-left: 0;
+            margin-right: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .login-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .forgot-password, .token-login {
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .forgot-password a, .token-login a {
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.8em;
+        }
+
+        .forgot-password a:hover, .token-login a:hover {
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .input-field {
             width: 100%;
             padding: 10px;
-            margin: 10px 0;
-            border-radius: 6px;
-            border: none;
-            background: #333;
+            margin-top: 30px;
+            margin-left: 0;
+            margin-right: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
             color: white;
-            text-align: left;
-            padding-left: 10px;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
         }
 
-        .links-container {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
+        .input-field.error {
+            border: 1px solid red;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.8em;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .divider {
+            margin: 20px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .no-account {
+            text-align: center;
             margin-top: 10px;
-        }
-
-        .link {
-            color: lightblue;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .link:hover {
-            color: white;
-        }
-
-        .btn-full {
-            width: 100%;
-            background: #333;
-            margin-top: 40px;
-            padding: 12px;
-        }
-
-        .btn-full:hover {
-            background: #444;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.7);
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <a href="index.html">
-            <img src="https://i.imgur.com/fiBGS25.png" alt="Storm Logo">
-        </a>
-        <a href="dashboard.html" class="dashboard-btn">Dashboard</a>
-    </div>
-
-    <div class="container">
-        <div class="panel">
-            <input type="email" id="email" class="input-field" placeholder="Email">
-            <input type="password" id="password" class="input-field" placeholder="Password">
-            <div class="links-container">
-                <span class="link" onclick="resetPassword()">Reset Password</span>
-                <span class="link" id="toggle-mode" onclick="toggleMode()">Register</span>
-            </div>
-            <button class="btn-full" id="auth-button" onclick="authenticate()">Login</button>
+    <div class="login-container">
+        <div class="fingerprint-icon">
+            <img src="https://i.imgur.com/fiBGS25.png" alt="Logo">
         </div>
+        <form id="loginForm">
+            <input type="email" class="input-field" id="email" placeholder="Email" required>
+            <input type="password" class="input-field" id="password" placeholder="Password" required>
+            <div style="display: flex; justify-content: space-between; width: 100%;">
+                <div class="token-login">
+                    <a href="#">Token Login</a>
+                </div>
+                <div class="forgot-password">
+                    <a href="#">Forgot Password?</a>
+                </div>
+            </div>
+            <button type="button" class="login-button" id="signin">Sign In</button>
+            <div class="divider"></div>
+            <button type="button" class="login-button" id="createAccount">Create Account</button>
+            <div style="text-align: center; margin-top: -330px; font-size: 0.8em; color: rgba(255, 255, 255, 0.5); font-family: 'Poppins', sans-serif; font-weight: bold;">
+                Storm Softworks Account
+            </div>
+            <div style="text-align: center; margin-top: 330px; font-size: 0.8em; color: rgba(255, 255, 255, 0.5); font-family: 'Poppins', sans-serif; font-weight: normal;">
+                version-cef330ww28c8
+            </div>
+        </form>
     </div>
 
     <script>
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBClf7XcskCj2eQpeMcgEo7nDtJlK6TxmU",
             authDomain: "storm-v5.firebaseapp.com",
@@ -136,95 +166,72 @@
             appId: "1:635578156232:web:8f47ae67074ac6fab551fd"
         };
 
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const database = firebase.database();
 
-        let isRegistering = false;
+        // Sign In Function
+        function signin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-        // Check if user is already logged in
-        window.onload = function() {
-            const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-            if (userInfo) {
-                showUserInfo(userInfo.userId, userInfo.email, userInfo.password, userInfo.token);
-            }
-        };
-
-        function toggleMode() {
-            isRegistering = !isRegistering;
-            document.getElementById('toggle-mode').textContent = isRegistering ? 'Login' : 'Register';
-            document.getElementById('auth-button').textContent = isRegistering ? 'Register' : 'Login';
-            // Clear the input fields
-            document.getElementById('email').value = '';
-            document.getElementById('password').value = '';
+            auth.signInWithEmailAndPassword(email, password).then(userCredential => {
+                const user = userCredential.user;
+                database.ref('users/' + user.uid).once('value', snapshot => {
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        showUserInfo(user.uid, userData.email, userData.password, userData.token);
+                    }
+                });
+            }).catch(error => alert(error.message));
         }
 
+        // Create Account Function
+        function createAccount() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            auth.createUserWithEmailAndPassword(email, password).then(userCredential => {
+                const user = userCredential.user;
+                const token = generateToken();
+                database.ref('users/' + user.uid).set({
+                    email: user.email,
+                    password: password,
+                    token: token
+                });
+                showUserInfo(user.uid, user.email, password, token);
+            }).catch(error => alert(error.message));
+        }
+
+        // Generate Token
         function generateToken() {
             return "Storm_User_" + Array.from({ length: 20 }, () => Math.floor(Math.random() * 36).toString(36)).join('');
         }
 
-        function authenticate() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            if (isRegistering) {
-                // Register user
-                auth.createUserWithEmailAndPassword(email, password).then(userCredential => {
-                    const user = userCredential.user;
-                    const token = generateToken();
-                    database.ref('users/' + user.uid).set({
-                        email: user.email,
-                        password: password,
-                        token: token
-                    });
-                    const userInfo = {
-                        userId: user.uid,
-                        email: user.email,
-                        password: password,
-                        token: token
-                    };
-                    localStorage.setItem("userInfo", JSON.stringify(userInfo)); // Store user info in localStorage
-                    showUserInfo(user.uid, user.email, password, token);
-                }).catch(error => alert(error.message));
-            } else {
-                // Log in user
-                auth.signInWithEmailAndPassword(email, password).then(userCredential => {
-                    const user = userCredential.user;
-                    database.ref('users/' + user.uid).once('value', snapshot => {
-                        if (snapshot.exists()) {
-                            const userData = snapshot.val();
-                            const userInfo = {
-                                userId: user.uid,
-                                email: userData.email,
-                                password: userData.password,
-                                token: userData.token
-                            };
-                            localStorage.setItem("userInfo", JSON.stringify(userInfo)); // Store user info in localStorage
-                            showUserInfo(user.uid, userData.email, userData.password, userData.token);
-                        }
-                    });
-                }).catch(error => alert(error.message));
-            }
-        }
-
+        // Display User Info
         function showUserInfo(userId, email, password, token) {
-            document.body.innerHTML = `<div class='container'><div class='panel'><h2>User Info</h2>
-                <p><strong>Email:</strong> ${email}</p>
-                <p><strong>Password:</strong> ${password}</p>
-                <p><strong>User ID:</strong> ${userId}</p>
-                <p><strong>Token:</strong> ${token}</p>
-                <button class='btn-full' onclick='logout()'>Logout</button></div></div>`;
+            document.body.innerHTML = `
+                <div class="login-container">
+                    <h2>User Info</h2>
+                    <p><strong>Email:</strong> ${email}</p>
+                    <p><strong>Password:</strong> ${password}</p>
+                    <p><strong>User ID:</strong> ${userId}</p>
+                    <p><strong>Token:</strong> ${token}</p>
+                    <button class="login-button" onclick="logout()">Logout</button>
+                </div>`;
         }
 
-        function resetPassword() {
-            alert('Reset password link sent!');
-        }
-
-        // Logout function to clear localStorage and reload
+        // Logout Function
         function logout() {
-            localStorage.removeItem("userInfo");
-            location.reload();
+            auth.signOut().then(() => {
+                location.reload();
+            }).catch(error => alert(error.message));
         }
+
+        // Event Listeners for Buttons
+        document.getElementById('signin').addEventListener('click', signin);
+        document.getElementById('createAccount').addEventListener('click', createAccount);
     </script>
 </body>
 </html>
